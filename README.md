@@ -5,7 +5,7 @@ Hisobchi.ai is a fintech product that allows users to track their income and exp
 ## 🚀 Features
 - **Authentication**: JWT-based registration and login via REST API.
 - **Telegram Bot Integration**: Token-based user linking and transaction recording.
-- **Tariff Limits**: 
+- **Tariff Limits**:
     - **FREE**: 50 transactions per month, monthly summary.
     - **PRO**: Unlimited transactions, flexible summaries (daily, monthly, custom range).
 - **Reports**: Aggregate income, expense, and balance via API and Bot.
@@ -26,7 +26,7 @@ DATABASE_URL=postgresql://user:pass@localhost:5432/hisobchi
 REDIS_URL=redis://localhost:6379/0
 SECRET_KEY=your_secret_key
 ALGORITHM=HS256
-ACCESS_TOKEN_EXPIRE_MINUTES=30
+ACCESS_TOKEN_EXPIRE_DAYS=1
 BOT_TOKEN=your_telegram_bot_token
 ```
 

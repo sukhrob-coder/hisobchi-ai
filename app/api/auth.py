@@ -52,7 +52,7 @@ def login(form_data: Login, db: Session = Depends(get_db)):
             headers={"WWW-Authenticate": "Bearer"},
         )
 
-    access_token_expires = timedelta(days=settings.ACCESS_TOKEN_EXPIRE_MINUTES)
+    access_token_expires = timedelta(days=settings.ACCESS_TOKEN_EXPIRE_DAYS)
 
     access_token = create_access_token(
         subject=user.email, expires_delta=access_token_expires

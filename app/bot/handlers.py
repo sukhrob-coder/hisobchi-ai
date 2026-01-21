@@ -2,6 +2,8 @@ from datetime import datetime
 
 from aiogram import Router, types
 from aiogram.filters import Command
+from aiogram.filters import CommandStart
+from aiogram.filters.command import CommandObject
 from sqlalchemy.orm import Session
 
 from app.core.database import SessionLocal
@@ -11,33 +13,37 @@ from app.models.user import User
 
 router = Router()
 
-@router.message(Command("start"))
-async def cmd_start(message: types.Message):
-    args = message.text.split()
+@router.message(CommandStart())
+async def cmd_start(message: types.Message, command: CommandObject):
+    token = command.args
 
-    if len(args) > 1:
-        token = args[1]
-
-        user_id = get_user_id_by_token(token)
-
-        if user_id:
-            with SessionLocal() as db:
-                user = db.query(User).filter(User.id == int(user_id)).first()
-                if user:
-                    user.telegram_id = str(message.from_user.id)
-                    user.chatID = str(message.chat.id)
-                    user.name = message.from_user.full_name
-                    db.commit()
-                    delete_linking_token(token)
-                    await message.answer(f"Muvaffaqiyatli bog'landi! Xush kelibsiz, {user.name}!")
-                    return
-        await message.answer("Noto'g'ri yoki muddati o'tgan token.")
-
-    else:
+    if not token:
         await message.answer(
-            "Hisobchi.ai botiga xush kelibsiz! \n"
-            "Iltimos, API orqali linking token oling va uni /start <token> ko'rinishida yuboring."
+            "Hisobchi.ai botiga xush kelibsiz!\n"
+            "Iltimos, API orqali linking token oling va uni /start <token> ko‘rinishida yuboring."
         )
+        return
+
+    user_id = get_user_id_by_token(token)
+
+    if not user_id:
+        await message.answer("Noto‘g‘ri yoki muddati o‘tgan token.")
+        return
+
+    with SessionLocal() as db:
+        user = db.query(User).filter(User.id == int(user_id)).first()
+        if not user:
+            await message.answer("Foydalanuvchi topilmadi.")
+            return
+
+        user.telegram_id = str(message.from_user.id)
+        user.chatID = str(message.chat.id)
+        user.name = message.from_user.full_name
+        db.commit()
+
+    delete_linking_token(token)
+
+    await message.answer(f"Muvaffaqiyatli bog‘landi! Xush kelibsiz, {user.name}!")
 
 
 async def check_limit(user: User, db: Session) -> bool:
