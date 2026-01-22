@@ -32,6 +32,7 @@ async def cmd_start(message: types.Message, command: CommandObject):
 
     with SessionLocal() as db:
         user = db.query(User).filter(User.id == int(user_id)).first()
+        
         if not user:
             await message.answer("Foydalanuvchi topilmadi.")
             return
@@ -39,11 +40,13 @@ async def cmd_start(message: types.Message, command: CommandObject):
         user.telegram_id = str(message.from_user.id)
         user.chatID = str(message.chat.id)
         user.name = message.from_user.full_name
+        
+        user_name = user.name
         db.commit()
 
     delete_linking_token(token)
 
-    await message.answer(f"Muvaffaqiyatli bog‘landi! Xush kelibsiz, {user.name}!")
+    await message.answer(f"Muvaffaqiyatli bog‘landi! Xush kelibsiz, {user_name}!")
 
 
 async def check_limit(user: User, db: Session) -> bool:

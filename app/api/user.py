@@ -11,7 +11,7 @@ from ..models.transaction import Transaction, TransactionType
 from ..models.user import User
 from ..schemas.user import UserResponse, SummaryResponse
 
-router = APIRouter(tags=["user"])
+router = APIRouter(prefix="/user", tags=["user"])
 
 
 @router.get("/me", response_model=UserResponse)
