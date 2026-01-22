@@ -51,24 +51,3 @@ python bot_main.py
 3. User requests a linking token via `GET /auth/linking-token` (requires JWT).
 4. User sends `/start <token>` to the Telegram bot.
 5. The bot validates the token in Redis, associates the user's `telegram_id` with their API `user_id`, and saves the context.
-
-## 🧠 Q&A (Technical Questions)
-
-**1. FREE user 51-transaction yuborsa nima bo‘ladi?**
-Bot foydalanuvchiga limit tugaganligini va PRO tarifiga o'tishni tavsiya qiluvchi xabar qaytaradi. API esa mos ravishda xatolik qaytarishi kerak (masalan, 403 Forbidden yoki 429 Too Many Requests, mantiqan 403 to'g'riroq agar bu biznes limit bo'lsa).
-
-**2. Telegram’dan parallel requestlar qanday muammo keltirishi mumkin?**
-Parallel requestlar "Race Condition" muammosini keltirib chiqarishi mumkin. Masalan, foydalanuvchi bir vaqtning o'zida ikkita transaction yuborsa, limit tekshiruvi ikkalasida ham o'tib ketishi va natijada foydalanuvchi limitdan ko'proq transaction yuborishi mumkin. Buni oldini olish uchun Redis lock'laridan yoki DB darajasidagi tranzaksiyalardan foydalanish kerak.
-
-**3. Tokenni Telegram orqali yuborish qanchalik xavfsiz?**
-Bu o'rtacha xavfsiz, lekin mukammal emas. Telegram kanali shifrlangan bo'lsa-da, token xabar sifatida ko'rinadi. Xavfsizlikni oshirish uchun tokenni juda qisqa vaqt (masalan, 5 daqiqa) amalda bo'lishini ta'minlash va bir marta ishlatilgandan keyin o'chirish lozim.
-
-**4. Production’da Telegram botni qanday scale qilardingiz?**
-Botni scale qilishda `Webhook` rejimidan foydalanish tavsiya etiladi. Bir nechta bot instance'larini load balancer orqasiga qo'yish va ularni Redis orqali muvofiqlashtirish (Dispatcher storage) mumkin. Shuningdek, og'ir vazifalarni (masalan, hisobot tayyorlash) Celery kabi worker'larga yuklash kerak.
-
-**5. Agar vaqt bo‘lsa, nimani yaxshilardingiz?**
-- **Alembic**: Ma'lumotlar bazasi migratsiyalarini boshqarish uchun.
-- **Docker**: Loyihani oson deploy qilish uchun.
-- **Tests**: Pytest orqali unit va integration testlar.
-- **Logging/Sentry**: Xatoliklarni kuzatib borish uchun.
-- **FSM (Finite State Machine)**: Botda foydalanuvchi bilan muloqotni murakkabroq qilish uchun (masalan, transactionni qadam-baqadam kiritish).
